@@ -16,22 +16,31 @@ const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
+let inMemoryStore = [];
+
 const readDb = () => {
   try {
-    if (!fs.existsSync(DB)) {
-      fs.writeFileSync(DB, JSON.stringify([], null, 2));
-      return [];
+    if (fs.existsSync(DB)) {
+      const content = fs.readFileSync(DB, 'utf8');
+      if (content) {
+        const parsed = JSON.parse(content);
+        if (Array.isArray(parsed) && parsed.length >= inMemoryStore.length) {
+          inMemoryStore = parsed;
+          return inMemoryStore;
+        }
+      }
     }
-    const content = fs.readFileSync(DB, 'utf8');
-    return content ? JSON.parse(content) : [];
   } catch (err) {
     console.error('Error reading DB:', err.message);
-    return [];
   }
+  return inMemoryStore;
 };
 
 const writeDb = (d) => {
+  inMemoryStore = d;
   try {
+    const dir = path.dirname(DB);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(DB, JSON.stringify(d, null, 2));
   } catch (err) {
     console.error('Error writing DB:', err.message);
@@ -218,6 +227,13 @@ const admin = (req, res, next) => {
 app.get('/api/admin/bookings', admin, (req, res) => {
   const db = readDb();
   res.json([...db].reverse());
+});
+
+app.get('/api/admin/export', admin, (req, res) => {
+  const db = readDb();
+  res.setHeader('Content-Disposition', 'attachment; filename=flight_desk_bookings.json');
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(db, null, 2));
 });
 
 app.get('/api/admin/stats', admin, (req, res) => {
