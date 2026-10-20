@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flight Desk – Agent Booking Form</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --brand: #2563eb;
+      --brand-hover: #1d4ed8;
+      --brand-light: #eff6ff;
+      --ok: #16a34a;
+      --ok-light: #dcfce7;
+      --warn: #ea580c;
+      --warn-light: #ffedd5;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --line: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 24px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+    }
+    .brand-badge {
+      font-size: 11px;
+      background: #2563eb;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-btn {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      color: #fff;
+      background: #1e293b;
+    }
+    .nav-btn.primary {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 28px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+    }
+
+    .form-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--brand);
+      margin: 18px 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: all .15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+
+    .trip-selector {
+      display: inline-flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 10px;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .trip-tab {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: all .15s ease;
+    }
+    .trip-tab.active {
+      background: #fff;
+      color: var(--brand);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    .flight-pill {
+      background: var(--brand-light);
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button.btn {
+      background: var(--brand);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .15s ease;
+    }
+    button.btn:hover { background: var(--brand-hover); }
+    button.btn-success { background: var(--ok); color: #fff; }
+    button.btn-success:hover { background: #15803d; }
+    button.btn-secondary { background: #f1f5f9; color: var(--ink); }
+
+    .muted { color: var(--muted); font-size: 13px; }
+    .err-box { background: var(--danger-light); color: var(--danger); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 14px; }
+    .hide { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="brand-logo">
+      <span>✈️ Flight Desk</span>
+      <span class="brand-badge">BOOKING DESK</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-btn">Flight Search</a>
+      <a href="/book" class="nav-btn active">Booking Page</a>
+      <a href="/admin" class="nav-btn primary">Admin Portal 🔐</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom: 16px;">
+      <div>
+        <h1>📋 Agent Flight Booking</h1>
+        <div class="muted">Fill in traveler and agent details to generate and store a booking in the temporary DB</div>
+      </div>
+      <a href="/" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">← Back to Flight Search</a>
+    </div>
+
+    <!-- Pre-selected flight notification (if coming from search) -->
+    <div id="preselectedBox" class="flight-pill hide">
+      <div>
+        <span style="font-size: 11px; font-weight: 800; background: var(--brand); color: #fff; padding: 2px 8px; border-radius: 4px;">
+          PRE-SELECTED FROM SEARCH
+        </span>
+        <div id="preselectedDetails" style="font-weight: 700; font-size: 15px; margin-top: 4px;"></div>
+      </div>
+      <div id="preselectedFare" style="font-size: 20px; font-weight: 800; color: var(--ok);"></div>
+    </div>
+
+    <form id="bookingPageForm">
+      
+      <!-- 1. Agent & Agency -->
+      <div class="form-section-title">
+        <span>🏢</span> Agent Information
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>Agent Name / Agency Name *</label>
+          <input type="text" id="agentName" name="agentName" required placeholder="e.g. Travel Express / Priya Singh">
+        </div>
+        <div>
+          <label>Agent Mobile / WhatsApp *</label>
+          <input type="tel" id="mobile" name="mobile" required placeholder="+91 9876543210">
+        </div>
+      </div>
+
+      <!-- 2. Passenger Details -->
+      <div class="form-section-title">
+        <span>👤</span> Passenger Details
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>Passenger Name (Primary Traveler) *</label>
+          <input type="text" id="passengerName" name="passengerName" required placeholder="Full Name as on Govt Photo ID">
+        </div>
+        <div>
+          <label>Email Address *</label>
+          <input type="email" id="email" name="email" required placeholder="passenger@example.com">
+        </div>
+      </div>
+
+      <!-- 3. Flight Itinerary -->
+      <div class="form-section-title">
+        <span>✈️</span> Flight & Journey Details
+      </div>
+
+      <div class="trip-selector">
+        <button type="button" class="trip-tab active" id="btnOneWay" onclick="selectTrip('One Way')">One Way</button>
+        <button type="button" class="trip-tab" id="btnRoundTrip" onclick="selectTrip('Round Trip')">Round Trip</button>
+      </div>
+
+      <div class="grid-3">
+        <div>
+          <label>Departure Airport (Code/City) *</label>
+          <input type="text" id="fromAirport" list="airports" required placeholder="DEL" style="text-transform:uppercase;">
+        </div>
+        <div>
+          <label>Destination Airport (Code/City) *</label>
+          <input type="text" id="toAirport" list="airports" required placeholder="BOM" style="text-transform:uppercase;">
+        </div>
+        <div>
+          <label>Departure Date *</label>
+          <input type="date" id="deptDate" required>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top: 12px;">
+        <div id="retDateGroup">
+          <label>Return Date (For Round Trip)</label>
+          <input type="date" id="retDate" disabled>
+        </div>
+        <div>
+          <label>Airline / Flight No (Optional)</label>
+          <input type="text" id="flightNo" placeholder="e.g. IndiGo 6E-204">
+        </div>
+        <div>
+          <label>Quoted Ticket Fare (₹) *</label>
+          <input type="number" id="quotedFare" required min="100" placeholder="e.g. 4500">
+        </div>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <label>Additional Notes / Special Requests (Optional)</label>
+        <textarea id="notes" rows="2" placeholder="Dietary preference, wheelchair assistance, extra baggage, co-passengers"></textarea>
+      </div>
+
+      <div class="row" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+        <div class="muted">
+          💾 Data is securely saved to temporary DB (<code>bookings.json</code>)
+        </div>
+        <button type="submit" class="btn btn-success" id="submitBtn">
+          ✓ Confirm & Save Booking Request
+        </button>
+      </div>
+      <div id="submitMsg"></div>
+    </form>
+  </div>
+
+  <div id="confirmationBox" class="card hide" style="border: 2px solid var(--ok); background: #f0fdf4;"></div>
+
+  <datalist id="airports">
+    <option value="DEL">Delhi (DEL)</option>
+    <option value="BOM">Mumbai (BOM)</option>
+    <option value="BLR">Bengaluru (BLR)</option>
+    <option value="HYD">Hyderabad (HYD)</option>
+    <option value="MAA">Chennai (MAA)</option>
+    <option value="CCU">Kolkata (CCU)</option>
+    <option value="PNQ">Pune (PNQ)</option>
+    <option value="AMD">Ahmedabad (AMD)</option>
+    <option value="GOI">Goa (GOI)</option>
+    <option value="JAI">Jaipur (JAI)</option>
+    <option value="RPR">Raipur (RPR)</option>
+    <option value="LKO">Lucknow (LKO)</option>
+  </datalist>
+
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const inr = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  let currentTrip = 'One Way';
+  const today = new Date().toISOString().slice(0, 10);
+  $('deptDate').min = today;
+  $('deptDate').value = today;
+
+  function selectTrip(trip) {
+    currentTrip = trip;
+    if (trip === 'One Way') {
+      $('btnOneWay').classList.add('active');
+      $('btnRoundTrip').classList.remove('active');
+      $('retDate').disabled = true;
+      $('retDate').value = '';
+      $('retDate').required = false;
+    } else {
+      $('btnRoundTrip').classList.add('active');
+      $('btnOneWay').classList.remove('active');
+      $('retDate').disabled = false;
+      $('retDate').required = true;
+      $('retDate').min = $('deptDate').value || today;
+    }
+  }
+
+  $('deptDate').addEventListener('change', () => {
+    if ($('retDate').min) {
+      $('retDate').min = $('deptDate').value;
+    }
+  });
+
+  // Check if session contains pending flight from search
+  try {
+    const raw = sessionStorage.getItem('pendingFlight');
+    if (raw) {
+      const flightData = JSON.parse(raw);
+      if (flightData && flightData.selected) {
+        const s = flightData.selected;
+        const q = flightData.searchQuery || {};
+        
+        $('preselectedBox').classList.remove('hide');
+        $('preselectedDetails').innerHTML = `
+          ${esc(s.airline)} • ${s.legs.map(l => `${l.from} → ${l.to} (${l.flightNo})`).join(' | ')}
+        `;
+        $('preselectedFare').textContent = inr(flightData.quotedPrice);
+
+        // Prefill form
+        if (q.from) $('fromAirport').value = q.from;
+        if (q.to) $('toAirport').value = q.to;
+        if (q.date) $('deptDate').value = q.date;
+        if (q.return) {
+          selectTrip('Round Trip');
+          $('retDate').value = q.return;
+        } else {
+          selectTrip(flightData.tripType || 'One Way');
+        }
+        $('flightNo').value = `${s.airline} ${s.legs.map(l => l.flightNo).join(', ')}`;
+        $('quotedFare').value = flightData.quotedPrice || s.ourPrice || '';
+      }
+    }
+  } catch (err) {
+    console.warn('No preselected flight:', err);
+  }
+
+  $('bookingPageForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = $('submitBtn');
+    btn.disabled = true;
+    $('submitMsg').innerHTML = '';
+
+    const agentName = $('agentName').value.trim();
+    const passengerName = $('passengerName').value.trim();
+    const email = $('email').value.trim();
+    const mobile = $('mobile').value.trim();
+    const from = $('fromAirport').value.trim().toUpperCase();
+    const to = $('toAirport').value.trim().toUpperCase();
+    const deptDate = $('deptDate').value;
+    const retDate = $('retDate').value;
+    const flightNo = $('flightNo').value.trim();
+    const quotedPrice = Number($('quotedFare').value) || 0;
+    const notes = $('notes').value.trim();
+
+    const payload = {
+      agentName,
+      passengerName,
+      email,
+      mobile,
+      tripType: currentTrip,
+      quotedPrice,
+      notes,
+      flightDetails: {
+        from,
+        to,
+        deptDate,
+        retDate: currentTrip === 'Round Trip' ? retDate : null,
+        flightNo,
+        routeSummary: `${from} → ${to}`
+      }
+    };
+
+    try {
+      const res = await fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit booking');
+
+      // Clear pending
+      sessionStorage.removeItem('pendingFlight');
+
+      // Show Confirmation Card
+      $('bookingPageForm').classList.add('hide');
+      $('preselectedBox').classList.add('hide');
+
+      const conf = $('confirmationBox');
+      conf.classList.remove('hide');
+      conf.innerHTML = `
+        <div style="text-align:center; padding: 20px;">
+          <div style="font-size: 40px; margin-bottom: 6px;">🎉</div>
+          <h2 style="color: var(--ok); margin: 0 0 6px 0;">Booking Successfully Created!</h2>
+          <div class="muted">Booking has been stored in temporary DB with reference:</div>
+          <div style="font-size: 26px; font-weight: 800; color: var(--brand); margin: 12px 0;">${data.id}</div>
+          
+          <div style="max-width: 500px; margin: 16px auto; text-align: left; background: #fff; padding: 18px; border-radius: 8px; border: 1px solid var(--line);">
+            <div style="margin-bottom: 6px;"><b>Agent:</b> ${esc(agentName)}</div>
+            <div style="margin-bottom: 6px;"><b>Passenger:</b> ${esc(passengerName)}</div>
+            <div style="margin-bottom: 6px;"><b>Contact:</b> ${esc(mobile)} (${esc(email)})</div>
+            <div style="margin-bottom: 6px;"><b>Trip:</b> ${esc(currentTrip)}: ${esc(from)} → ${esc(to)} (${deptDate}${retDate ? ' to ' + retDate : ''})</div>
+            <div style="margin-bottom: 6px;"><b>Quoted Fare:</b> <span style="color:var(--ok); font-weight:700;">${inr(quotedPrice)}</span></div>
+            <div><b>Status:</b> <span style="background:var(--warn-light); color:var(--warn); padding: 2px 8px; border-radius: 4px; font-weight:700; font-size:12px;">REQUESTED</span></div>
+          </div>
+
+          <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px;">
+            <a href="/admin" class="btn">View in Admin Portal 🔐</a>
+            <a href="/" class="btn btn-secondary">Search More Flights</a>
+            <button class="btn btn-secondary" onclick="location.reload()">New Booking</button>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      $('submitMsg').innerHTML = `<div class="err-box">${esc(err.message)}</div>`;
+      btn.disabled = false;
+    }
+  };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+[
+  {
+    "id": "FD-538334",
+    "createdAt": "2026-10-20T08:33:33.959Z",
+    "status": "requested",
+    "pnr": null,
+    "agentName": "j    jkj",
+    "passengerName": "jhn",
+    "email": "agrawalom711@gmail.com",
+    "mobile": "7609098787",
+    "tripType": "One Way",
+    "itinerary": {
+      "tripType": "One Way",
+      "outbound": null,
+      "selected": {
+        "airline": "Air India Express",
+        "logo": "https://www.gstatic.com/flights/airline_logos/70px/IX.png",
+        "legs": [
+          {
+            "from": "DEL",
+            "fromName": "Indira Gandhi International Airport",
+            "dep": "2026-10-20 23:25",
+            "to": "BOM",
+            "toName": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "arr": "2026-10-21 01:50",
+            "flightNo": "IX 1235",
+            "airline": "Air India Express",
+            "duration": 145
+          }
+        ],
+        "layovers": [],
+        "totalDuration": 145,
+        "googlePrice": 7180,
+        "ourPrice": 6680,
+        "bookingToken": "WyJDalJJZFRVMVJGQlBkV1I2Y3pCQlF6bEdXRUZDUnkwdExTMHRMUzB0ZG5kaWFXc3hOVUZCUVVGQlIzSllTbm80UjI1c1FXdEJFZ1pKV0RFeU16VWFDZ2lNT0JBQUdnTkpUbEk0SEhDWE93PT0iLFtbIkRFTCIsIjIwMjYtMTAtMjAiLCJCT00iLG51bGwsIklYIiwiMTIzNSJdXV0="
+      },
+      "query": {
+        "from": "DEL",
+        "to": "BOM",
+        "date": "2026-10-20",
+        "tripType": "oneway",
+        "adults": "1",
+        "children": "0",
+        "infants": "0",
+        "cls": "1",
+        "stops": ""
+      }
+    },
+    "quotedPrice": 6680,
+    "googlePrice": 7180,
+    "notes": "kjn",
+    "contact": {
+      "name": "jhn",
+      "phone": "7609098787",
+      "email": "agrawalom711@gmail.com",
+      "agency": "j    jkj"
+    },
+    "passengers": "jhn"
+  }
+]

@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flight Desk – Agent Flight Booking & Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --brand: #2563eb;
+      --brand-hover: #1d4ed8;
+      --brand-light: #eff6ff;
+      --ok: #16a34a;
+      --ok-light: #dcfce7;
+      --warn: #ea580c;
+      --warn-light: #ffedd5;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --line: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 24px;
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+    }
+    .brand-badge {
+      font-size: 11px;
+      background: #2563eb;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-btn {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: all .15s;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      color: #fff;
+      background: #1e293b;
+    }
+    .nav-btn.primary {
+      background: var(--brand);
+      color: #fff;
+    }
+    .nav-btn.primary:hover {
+      background: var(--brand-hover);
+    }
+
+    main {
+      max-width: 1040px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    /* Trip Type Toggle */
+    .trip-selector {
+      display: inline-flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+    .trip-tab {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .15s ease;
+    }
+    .trip-tab.active {
+      background: #fff;
+      color: var(--brand);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 640px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    input:disabled {
+      background: #f8fafc;
+      color: #94a3b8;
+      cursor: not-allowed;
+      border-color: #cbd5e1;
+    }
+
+    button.btn {
+      background: var(--brand);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 22px;
+      font: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all .15s ease;
+    }
+    button.btn:hover { background: var(--brand-hover); }
+    button.btn-secondary { background: #f1f5f9; color: var(--ink); }
+    button.btn-secondary:hover { background: #e2e8f0; }
+    button.btn-ghost { background: transparent; color: var(--brand); border: 1px solid var(--brand); }
+    button.btn-ghost:hover { background: var(--brand-light); }
+    button.btn-success { background: var(--ok); color: #fff; }
+    button.btn-success:hover { background: #15803d; }
+    button:disabled { opacity: .6; cursor: wait; }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .flight-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .flight-card:hover {
+      border-color: #cbd5e1;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .airline-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .airline-logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 2px;
+      border: 1px solid #e2e8f0;
+    }
+    .airline-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .flight-route {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+    .flight-time-point {
+      text-align: left;
+    }
+    .flight-time {
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .flight-airport {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .route-arrow {
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 12px;
+      padding: 0 4px;
+    }
+    .route-line {
+      width: 48px;
+      height: 2px;
+      background: #cbd5e1;
+      position: relative;
+      margin: 4px 0;
+    }
+
+    .fare-box {
+      text-align: right;
+      min-width: 140px;
+    }
+    .old-price {
+      text-decoration: line-through;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    .new-price {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--ok);
+      line-height: 1.1;
+    }
+    .badge-discount {
+      display: inline-block;
+      background: var(--ok-light);
+      color: var(--ok);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-top: 4px;
+    }
+    .badge-type {
+      display: inline-block;
+      background: var(--brand-light);
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+
+    .muted { color: var(--muted); font-size: 13px; }
+    .err-box {
+      background: var(--danger-light);
+      color: var(--danger);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .loading-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--brand-light);
+      color: var(--brand);
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 14px 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(37,99,235,0.2);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Booking section styling */
+    .booking-container {
+      background: #fff;
+      border: 2px solid var(--brand);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      margin-top: 20px;
+    }
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .hide { display: none !important; }
+
+    /* Status checker */
+    .status-card {
+      border-left: 4px solid var(--brand);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .status-requested { background: var(--warn-light); color: var(--warn); }
+    .status-booked { background: var(--ok-light); color: var(--ok); }
+    .status-cancelled { background: var(--danger-light); color: var(--danger); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="brand-logo">
+      <span>✈️ Flight Desk</span>
+      <span class="brand-badge">B2B AGENT FARES</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-btn active">Flight Search</a>
+      <a href="/book" class="nav-btn">New Booking</a>
+      <a href="/admin" class="nav-btn primary">Admin Portal 🔐</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- SEARCH FORM -->
+  <form id="searchForm" class="card">
+    <div class="row" style="margin-bottom: 12px;">
+      <!-- One Way vs Round Trip Toggle -->
+      <div class="trip-selector">
+        <button type="button" class="trip-tab active" id="tabOneWay" onclick="setTripType('oneway')">
+          <span>✈️</span> One Way
+        </button>
+        <button type="button" class="trip-tab" id="tabRoundTrip" onclick="setTripType('roundtrip')">
+          <span>🔄</span> Round Trip
+        </button>
+      </div>
+
+      <div class="muted" id="tripTypeDesc">One-way flight search with instant agent pricing</div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>Origin Airport</label>
+        <input id="from" list="airports" placeholder="DEL (e.g. Delhi)" required maxlength="3" style="text-transform:uppercase;">
+      </div>
+      <div>
+        <label>Destination Airport</label>
+        <input id="to" list="airports" placeholder="BOM (e.g. Mumbai)" required maxlength="3" style="text-transform:uppercase;">
+      </div>
+      <div>
+        <label>Departure Date</label>
+        <input id="date" type="date" required>
+      </div>
+      <div id="retGroup">
+        <label id="retLabel">Return Date</label>
+        <input id="ret" type="date" disabled placeholder="Select round trip">
+      </div>
+      <div>
+        <label>Adults (12+)</label>
+        <input id="adults" type="number" min="1" max="9" value="1">
+      </div>
+      <div>
+        <label>Children (2–11)</label>
+        <input id="children" type="number" min="0" max="8" value="0">
+      </div>
+      <div>
+        <label>Infants (0–2)</label>
+        <input id="infants" type="number" min="0" max="4" value="0">
+      </div>
+      <div>
+        <label>Cabin Class</label>
+        <select id="cls">
+          <option value="1">Economy</option>
+          <option value="2">Premium Economy</option>
+          <option value="3">Business</option>
+          <option value="4">First Class</option>
+        </select>
+      </div>
+      <div>
+        <label>Stops Filter</label>
+        <select id="stops">
+          <option value="">Any Stops</option>
+          <option value="1">Non-stop only</option>
+          <option value="2">Up to 1 Stop</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line);">
+      <div class="muted">
+        💡 Agent Discount: <b style="color:var(--ok)">₹500 OFF</b> per passenger automatically applied!
+      </div>
+      <button type="submit" class="btn" id="searchBtn">
+        <span>🔍</span> Search Flights
+      </button>
+    </div>
+
+    <datalist id="airports">
+      <option value="DEL">DEL - Delhi (Indira Gandhi Intl)</option>
+      <option value="BOM">BOM - Mumbai (Chhatrapati Shivaji)</option>
+      <option value="BLR">BLR - Bengaluru (Kempegowda)</option>
+      <option value="HYD">HYD - Hyderabad (Rajiv Gandhi)</option>
+      <option value="MAA">MAA - Chennai International</option>
+      <option value="CCU">CCU - Kolkata (Netaji Subhash)</option>
+      <option value="PNQ">PNQ - Pune Airport</option>
+      <option value="AMD">AMD - Ahmedabad (Sardar Vallabhbhai)</option>
+      <option value="GOI">GOI - Goa Dabolim / MOPA</option>
+      <option value="JAI">JAI - Jaipur International</option>
+      <option value="LKO">LKO - Lucknow (Chaudhary Charan Singh)</option>
+      <option value="RPR">RPR - Raipur (Swami Vivekananda)</option>
+      <option value="BBI">BBI - Bhubaneswar (Biju Patnaik)</option>
+      <option value="NAG">NAG - Nagpur (Dr. Babasaheb Ambedkar)</option>
+      <option value="PAT">PAT - Patna (Jay Prakash Narayan)</option>
+      <option value="IXC">IXC - Chandigarh International</option>
+      <option value="SXR">SXR - Srinagar Airport</option>
+      <option value="DXB">DXB - Dubai International</option>
+      <option value="SIN">SIN - Singapore Changi</option>
+      <option value="BKK">BKK - Bangkok Suvarnabhumi</option>
+    </datalist>
+  </form>
+
+  <div id="statusNotice"></div>
+  <div id="outboundSummary"></div>
+  <div id="results"></div>
+
+  <!-- BOOKING SECTION (INTEGRATED ON SELECT) -->
+  <div id="bookingSection" class="booking-container hide">
+    <div class="row" style="margin-bottom: 14px;">
+      <div>
+        <h2 style="margin:0; font-size: 20px;">📝 Complete Agent Flight Booking</h2>
+        <div class="muted">Enter traveler and agency information to issue booking</div>
+      </div>
+      <button type="button" class="btn btn-secondary" onclick="closeBooking()">✕ Close</button>
+    </div>
+
+    <div id="bookingFlightSummary" class="summary-box"></div>
+
+    <form id="activeBookForm">
+      <h3 style="font-size: 16px; margin: 0 0 12px 0;">Agent & Passenger Information</h3>
+      
+      <div class="grid-2">
+        <div>
+          <label>Agent Name / Agency Name *</label>
+          <input type="text" id="bkAgentName" required placeholder="e.g. Travel Express / Rajesh Verma">
+        </div>
+        <div>
+          <label>Passenger Name (Primary Passenger) *</label>
+          <input type="text" id="bkPassengerName" required placeholder="Full Name as on Passport / Aadhaar">
+        </div>
+        <div>
+          <label>Email Address *</label>
+          <input type="email" id="bkEmail" required placeholder="passenger or agent email">
+        </div>
+        <div>
+          <label>Mobile Number / WhatsApp *</label>
+          <input type="tel" id="bkMobile" required placeholder="+91 9876543210">
+        </div>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <label>Additional Passengers / Remarks (Optional)</label>
+        <textarea id="bkNotes" rows="2" placeholder="Names of additional passengers, meal choice, seat preference, baggage requests"></textarea>
+      </div>
+
+      <div class="row" style="margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line);">
+        <div>
+          <div class="muted">Temporary DB Storage:</div>
+          <div style="font-size: 13px; font-weight: 600;">Saved immediately to database for Admin processing</div>
+        </div>
+        <button type="submit" class="btn btn-success" id="bkSubmitBtn" style="font-size: 15px; padding: 12px 28px;">
+          ✓ Submit Booking Request
+        </button>
+      </div>
+      <div id="bookingSubmitMsg"></div>
+    </form>
+  </div>
+
+  <!-- CHECK STATUS CARD -->
+  <div class="card status-card">
+    <div class="row">
+      <div>
+        <div style="font-weight: 700; font-size: 16px;">🔍 Track Existing Booking Status</div>
+        <div class="muted">Enter your Reference ID (e.g. FD-A1B2C3) to check current PNR & booking progress</div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <input id="refInput" placeholder="FD-XXXXXX" style="width: 150px; text-transform: uppercase;">
+        <button class="btn btn-ghost" id="refBtn" type="button">Check Status</button>
+      </div>
+    </div>
+    <div id="refOut" style="margin-top: 12px;"></div>
+  </div>
+
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const inr = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
+  const hm = (m) => `${Math.floor(m / 60)}h ${m % 60}m`;
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  
+  const fmtTime = (t) => {
+    if (!t) return '--:--';
+    const d = new Date(t.replace(' ', 'T'));
+    return isNaN(d) ? t : d.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  };
+
+  // State
+  let currentTripType = 'oneway';
+  let searchQuery = '';
+  let outboundSelected = null;
+  let finalSelectedFlight = null;
+  let currentDiscount = 500;
+
+  // Set min date to today, but default departure date to tomorrow
+  const today = new Date().toISOString().slice(0, 10);
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  $('date').min = today;
+  $('date').value = tomorrow;
+
+  function setTripType(type) {
+    currentTripType = type;
+    const tabOneWay = $('tabOneWay');
+    const tabRoundTrip = $('tabRoundTrip');
+    const retInput = $('ret');
+    const desc = $('tripTypeDesc');
+
+    if (type === 'oneway') {
+      tabOneWay.classList.add('active');
+      tabRoundTrip.classList.remove('active');
+      retInput.disabled = true;
+      retInput.value = '';
+      retInput.required = false;
+      retInput.style.opacity = '0.5';
+      desc.textContent = 'One-way flight search with instant agent pricing';
+    } else {
+      tabRoundTrip.classList.add('active');
+      tabOneWay.classList.remove('active');
+      retInput.disabled = false;
+      retInput.required = true;
+      retInput.min = $('date').value || today;
+      retInput.style.opacity = '1';
+      desc.textContent = 'Round-trip flight search (Select outbound first, then return)';
+    }
+  }
+
+  $('date').addEventListener('change', () => {
+    if ($('ret').min) {
+      $('ret').min = $('date').value;
+      if ($('ret').value && $('ret').value < $('date').value) {
+        $('ret').value = $('date').value;
+      }
+    }
+  });
+
+  async function api(path, opts = {}) {
+    const res = await fetch(path, opts);
+    const json = await res.json();
+    if (!res.ok || json.error) throw new Error(json.error || 'Server error');
+    return json;
+  }
+
+  function renderFlightCard(flight, actionLabel, onSelect, isReturn = false) {
+    const card = document.createElement('div');
+    card.className = 'flight-card';
+
+    const legsHtml = flight.legs.map((l) => `
+      <div class="flight-route">
+        <div class="flight-time-point">
+          <div class="flight-time">${fmtTime(l.dep)}</div>
+          <div class="flight-airport"><b>${l.from}</b> (${esc(l.fromName || '')})</div>
+        </div>
+        <div class="route-arrow">
+          <span>${esc(l.flightNo || '')}</span>
+          <div class="route-line"></div>
+          <span>${l.duration ? hm(l.duration) : ''}</span>
+        </div>
+        <div class="flight-time-point">
+          <div class="flight-time">${fmtTime(l.arr)}</div>
+          <div class="flight-airport"><b>${l.to}</b> (${esc(l.toName || '')})</div>
+        </div>
+      </div>
+    `).join('');
+
+    const stopsText = flight.layovers.length 
+      ? `${flight.layovers.length} Stop (${flight.layovers.map(l => l.id).join(', ')})`
+      : 'Non-stop';
+
+    card.innerHTML = `
+      <div style="flex: 1; min-width: 260px;">
+        <div class="airline-info">
+          ${flight.logo ? `<img class="airline-logo" src="${esc(flight.logo)}" alt="">` : ''}
+          <div class="airline-name">${esc(flight.airline)}</div>
+          <span class="muted" style="font-size:12px;">• ${hm(flight.totalDuration)} • ${stopsText}</span>
+        </div>
+        ${legsHtml}
+      </div>
+
+      <div class="fare-box">
+        ${flight.googlePrice ? `
+          <div class="old-price">Standard: ${inr(flight.googlePrice)}</div>
+          <div class="new-price">${inr(flight.ourPrice)}</div>
+          <div class="badge-discount">Save ${inr(flight.googlePrice - flight.ourPrice)}</div>
+        ` : `
+          <div class="muted">Fare on confirmation</div>
+        `}
+        <div style="margin-top: 10px;">
+          <button type="button" class="btn select-btn">${actionLabel}</button>
+        </div>
+      </div>
+    `;
+
+    card.querySelector('.select-btn').onclick = () => onSelect(flight);
+    return card;
+  }
+
+  // Handle Search Submission
+  $('searchForm').onsubmit = async (e) => {
+    e.preventDefault();
+    closeBooking();
+    outboundSelected = null;
+    finalSelectedFlight = null;
+
+    const fromVal = $('from').value.trim().toUpperCase();
+    const toVal = $('to').value.trim().toUpperCase();
+    const dateVal = $('date').value;
+    const retVal = $('ret').value;
+
+    if (currentTripType === 'roundtrip' && !retVal) {
+      alert('Please select a return date for round trip');
+      return;
+    }
+
+    const params = new URLSearchParams({
+      from: fromVal,
+      to: toVal,
+      date: dateVal,
+      tripType: currentTripType,
+      adults: $('adults').value,
+      children: $('children').value,
+      infants: $('infants').value,
+      cls: $('cls').value,
+      stops: $('stops').value
+    });
+
+    if (currentTripType === 'roundtrip' && retVal) {
+      params.set('return', retVal);
+    }
+
+    searchQuery = params.toString();
+    $('searchBtn').disabled = true;
+    $('results').innerHTML = '';
+    $('outboundSummary').innerHTML = '';
+    $('statusNotice').innerHTML = `
+      <div class="loading-box">
+        <div class="spinner"></div>
+        Searching live flight fares from ${fromVal} to ${toVal} (${currentTripType === 'roundtrip' ? 'Round Trip' : 'One Way'})...
+      </div>
+    `;
+
+    try {
+      const data = await api('/api/search?' + searchQuery);
+      currentDiscount = data.discount || 500;
+      $('statusNotice').innerHTML = '';
+
+      const title = currentTripType === 'roundtrip' 
+        ? 'Select Outbound Flight (Total round-trip fare shown)'
+        : `Available One-Way Flights (${fromVal} → ${toVal})`;
+
+      const action = currentTripType === 'roundtrip' ? 'Select Outbound →' : 'Book Flight ✓';
+      const onSelect = currentTripType === 'roundtrip' ? pickOutboundFlight : openBookingForm;
+
+      renderResultsList(data.flights, title, action, onSelect);
+    } catch (err) {
+      const msg = err.message || '';
+      if (msg.toLowerCase().includes("hasn't returned any results")) {
+        $('statusNotice').innerHTML = `
+          <div class="card" style="border: 1px solid #fef08a; background: #fefce8; padding: 18px; margin: 16px 0;">
+            <div style="font-weight: 700; color: #854d0e; font-size: 15px; margin-bottom: 6px;">
+              ⚠️ No Flights Available for this Selection
+            </div>
+            <div class="muted" style="color: #713f12; font-size: 13px;">
+              Google Flights did not return any flight results for <b>${esc(fromVal)} → ${esc(toVal)}</b> on <b>${esc(dateVal)}</b>.
+              <ul style="margin: 8px 0 0 20px; padding: 0;">
+                <li>Try selecting a departure date at least 1–3 days in advance (same-day flights may already have departed).</li>
+                <li>Verify airport 3-letter IATA codes (e.g., <b>DEL</b> for Delhi, <b>BOM</b> for Mumbai, <b>BLR</b> for Bengaluru).</li>
+                <li>If stops filter is set to "Non-stop only", try switching to "Any Stops".</li>
+              </ul>
+            </div>
+          </div>`;
+      } else {
+        $('statusNotice').innerHTML = `<div class="err-box">Error searching flights: ${esc(err.message)}</div>`;
+      }
+    } finally {
+      $('searchBtn').disabled = false;
+    }
+  };
+
+  function renderResultsList(flights, title, actionText, onSelect) {
+    const container = $('results');
+    container.innerHTML = `<h3 style="margin: 20px 0 12px 0;">${title}</h3>`;
+
+    if (!flights || !flights.length) {
+      container.innerHTML += `
+        <div class="card muted" style="text-align:center; padding: 30px;">
+          <div style="font-size: 26px; margin-bottom: 6px;">✈️</div>
+          <b>No flights found matching your search.</b><br>
+          Please try choosing a date a few days ahead or change airport codes.
+        </div>`;
+      return;
+    }
+
+    flights.forEach((f) => {
+      container.appendChild(renderFlightCard(f, actionText, onSelect));
+    });
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Round Trip Step 2: Outbound Picked -> Load Return Flights
+  async function pickOutboundFlight(f) {
+    outboundSelected = f;
+    $('statusNotice').innerHTML = `
+      <div class="loading-box">
+        <div class="spinner"></div>
+        Outbound selected! Fetching matching return flights...
+      </div>
+    `;
+
+    // Render Outbound Summary Card
+    $('outboundSummary').innerHTML = `
+      <div class="card" style="border: 2px solid var(--ok); background: #f0fdf4;">
+        <div class="row">
+          <div>
+            <span class="badge-discount">✓ OUTBOUND FLIGHT SELECTED</span>
+            <div style="font-weight: 700; font-size: 16px; margin-top: 4px;">
+              ${esc(f.airline)} • ${f.legs.map(l => l.from + ' → ' + l.to + ' (' + l.flightNo + ')').join(' | ')}
+            </div>
+            <div class="muted">${fmtTime(f.legs[0].dep)} — ${fmtTime(f.legs[f.legs.length - 1].arr)}</div>
+          </div>
+          <button type="button" class="btn btn-secondary" onclick="resetOutbound()">Change Outbound</button>
+        </div>
+      </div>
+    `;
+
+    try {
+      const data = await api(`/api/return?${searchQuery}&departure_token=${encodeURIComponent(f.departureToken)}`);
+      $('statusNotice').innerHTML = '';
+      renderResultsList(data.flights, 'Choose Your Return Flight', 'Book Round Trip ✓', (retFlight) => {
+        finalSelectedFlight = retFlight;
+        openBookingForm(retFlight);
+      });
+    } catch (err) {
+      $('statusNotice').innerHTML = `<div class="err-box">Error loading return flights: ${esc(err.message)}</div>`;
+    }
+  }
+
+  function resetOutbound() {
+    outboundSelected = null;
+    $('outboundSummary').innerHTML = '';
+    $('searchForm').dispatchEvent(new Event('submit'));
+  }
+
+  // Open the Booking Form with prefilled flight info
+  function openBookingForm(flight) {
+    finalSelectedFlight = flight;
+    const isRound = currentTripType === 'roundtrip' && outboundSelected;
+    
+    // Save to sessionStorage so if user navigates to /book it's preserved
+    const bookingPayload = {
+      tripType: isRound ? 'Round Trip' : 'One Way',
+      quotedPrice: flight.ourPrice,
+      googlePrice: flight.googlePrice,
+      outbound: outboundSelected,
+      returnFlight: isRound ? flight : null,
+      selected: flight,
+      searchQuery: Object.fromEntries(new URLSearchParams(searchQuery))
+    };
+    sessionStorage.setItem('pendingFlight', JSON.stringify(bookingPayload));
+
+    // Fill Summary
+    let summaryHtml = `
+      <div class="row">
+        <div>
+          <span class="badge-type">${isRound ? 'Round Trip Booking' : 'One Way Booking'}</span>
+          <h4 style="margin: 8px 0 4px 0; font-size: 18px;">${esc(flight.airline)}</h4>
+          <div class="muted">
+            ${flight.legs.map(l => `<b>${l.from}</b> (${fmtTime(l.dep)}) → <b>${l.to}</b> (${fmtTime(l.arr)}) · ${l.flightNo}`).join('<br>')}
+          </div>
+          ${isRound ? `
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line);">
+              <b style="color:var(--brand);">Outbound:</b> ${outboundSelected.legs.map(l => `${l.from} → ${l.to} (${l.flightNo})`).join(', ')}
+            </div>
+          ` : ''}
+        </div>
+        <div style="text-align: right;">
+          <div class="muted">Total Quoted Fare:</div>
+          <div class="new-price">${inr(flight.ourPrice)}</div>
+          <div class="badge-discount">Includes ₹${currentDiscount} Discount</div>
+        </div>
+      </div>
+    `;
+
+    $('bookingFlightSummary').innerHTML = summaryHtml;
+    $('bookingSection').classList.remove('hide');
+    $('bookingSection').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function closeBooking() {
+    $('bookingSection').classList.add('hide');
+  }
+
+  // Handle Booking Form Submission -> Saves to temporary DB
+  $('activeBookForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = $('bkSubmitBtn');
+    btn.disabled = true;
+    $('bookingSubmitMsg').innerHTML = '';
+
+    const agentName = $('bkAgentName').value.trim();
+    const passengerName = $('bkPassengerName').value.trim();
+    const email = $('bkEmail').value.trim();
+    const mobile = $('bkMobile').value.trim();
+    const notes = $('bkNotes').value.trim();
+
+    const isRound = currentTripType === 'roundtrip' && outboundSelected;
+    const flight = finalSelectedFlight;
+
+    const payload = {
+      agentName,
+      passengerName,
+      email,
+      mobile,
+      notes,
+      tripType: isRound ? 'Round Trip' : 'One Way',
+      quotedPrice: flight?.ourPrice || 0,
+      googlePrice: flight?.googlePrice || 0,
+      itinerary: {
+        tripType: isRound ? 'Round Trip' : 'One Way',
+        outbound: outboundSelected,
+        selected: flight,
+        query: Object.fromEntries(new URLSearchParams(searchQuery))
+      }
+    };
+
+    try {
+      const resp = await api('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      $('bookingSection').innerHTML = `
+        <div style="text-align: center; padding: 24px;">
+          <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
+          <h2 style="color: var(--ok); margin: 0 0 8px 0;">Booking Request Submitted Successfully!</h2>
+          <p class="muted">Saved directly to temporary database. Admin can now review and issue PNR.</p>
+          
+          <div class="card" style="max-width: 460px; margin: 20px auto; text-align: left; background: #f8fafc; border: 2px dashed var(--line);">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+              <span class="muted">Reference ID:</span>
+              <b style="font-size: 18px; color: var(--brand);">${resp.id}</b>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+              <span class="muted">Agent:</span>
+              <b>${esc(agentName)}</b>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+              <span class="muted">Passenger:</span>
+              <b>${esc(passengerName)}</b>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+              <span class="muted">Fare:</span>
+              <b style="color: var(--ok);">${inr(payload.quotedPrice)}</b>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span class="muted">Initial Status:</span>
+              <span class="status-badge status-requested">Requested</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px;">
+            <a href="/admin" class="btn">View in Admin Dashboard 📊</a>
+            <button type="button" class="btn btn-secondary" onclick="location.reload()">Book Another Flight</button>
+          </div>
+        </div>
+      `;
+
+      $('refInput').value = resp.id;
+    } catch (err) {
+      $('bookingSubmitMsg').innerHTML = `<div class="err-box">Failed to submit: ${esc(err.message)}</div>`;
+      btn.disabled = false;
+    }
+  };
+
+  // Status Checker
+  $('refBtn').onclick = async () => {
+    const id = $('refInput').value.trim();
+    if (!id) return;
+    $('refOut').innerHTML = '<span class="muted">Checking status...</span>';
+    try {
+      const data = await api('/api/status/' + encodeURIComponent(id));
+      const badgeClass = data.status === 'booked' ? 'status-booked' : (data.status === 'cancelled' ? 'status-cancelled' : 'status-requested');
+      
+      $('refOut').innerHTML = `
+        <div class="card" style="margin-top: 8px; background: #fff;">
+          <div class="row">
+            <div>
+              <b>${esc(data.id)}</b> · Passenger: <b>${esc(data.passengerName || 'N/A')}</b> · Agent: <b>${esc(data.agentName || 'N/A')}</b>
+              <div class="muted">Trip: ${esc(data.tripType || 'Flight')} · Quoted: ${inr(data.quotedPrice)}</div>
+            </div>
+            <div>
+              <span class="status-badge ${badgeClass}">${esc(data.status)}</span>
+              ${data.pnr ? `<div style="margin-top: 4px; font-weight: 700; color: var(--ok);">PNR: ${esc(data.pnr)}</div>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      $('refOut').innerHTML = `<span style="color:var(--danger)">${esc(e.message)}</span>`;
+    }
+  };
+</script>
+</body>
+</html>

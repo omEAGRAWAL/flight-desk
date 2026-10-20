@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flight Desk – Admin Booking Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #151b2b;
+      --card-border: #232c42;
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --brand: #3b82f6;
+      --brand-hover: #2563eb;
+      --ok: #10b981;
+      --ok-light: rgba(16, 185, 129, 0.15);
+      --warn: #f59e0b;
+      --warn-light: rgba(245, 158, 11, 0.15);
+      --danger: #ef4444;
+      --danger-light: rgba(239, 68, 68, 0.15);
+      --line: #1e293b;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    header {
+      background: #101626;
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge-admin {
+      background: #3b82f6;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-btn {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: #1e293b;
+      transition: all .15s;
+    }
+    .nav-btn:hover { background: #334155; color: #fff; }
+
+    main {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 800;
+      margin-top: 4px;
+      line-height: 1.2;
+    }
+
+    /* Filter & Search Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .filter-tabs {
+      display: inline-flex;
+      background: #0f172a;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      gap: 4px;
+    }
+    .filter-tab {
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .filter-tab.active {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    input, select, button {
+      font: inherit;
+    }
+    input[type="text"], input[type="password"] {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--ink);
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: var(--brand);
+    }
+
+    button.btn {
+      background: var(--brand);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .15s;
+    }
+    button.btn:hover { background: var(--brand-hover); }
+    button.btn-success { background: var(--ok); color: #fff; }
+    button.btn-success:hover { background: #059669; }
+    button.btn-danger { background: var(--danger); color: #fff; }
+    button.btn-danger:hover { background: #dc2626; }
+    button.btn-secondary { background: #1e293b; color: var(--ink); }
+    button.btn-secondary:hover { background: #334155; }
+
+    /* Bookings List Cards */
+    .booking-item {
+      background: #131927;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      transition: border-color .15s;
+    }
+    .booking-item:hover {
+      border-color: #3b82f6;
+    }
+    .booking-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 12px;
+    }
+    .booking-id {
+      font-size: 17px;
+      font-weight: 800;
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .badge-requested { background: var(--warn-light); color: var(--warn); border: 1px solid rgba(245,158,11,0.3); }
+    .badge-booked { background: var(--ok-light); color: var(--ok); border: 1px solid rgba(16,185,129,0.3); }
+    .badge-cancelled { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+    .badge-trip { background: #1e293b; color: #94a3b8; }
+
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1.5fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 800px) {
+      .booking-grid { grid-template-columns: 1fr; }
+    }
+
+    .info-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .info-val {
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .info-val b { font-weight: 700; }
+    .info-val a { color: #60a5fa; text-decoration: none; }
+    .info-val a:hover { text-decoration: underline; }
+
+    .route-box {
+      background: #0b0f19;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+
+    .action-panel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .pnr-input {
+      width: 140px !important;
+      padding: 7px 10px !important;
+      font-size: 13px !important;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .muted { color: var(--muted); font-size: 13px; }
+    .hide { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <h2 style="margin: 0; font-size: 19px;">✈️ Flight Desk Admin</h2>
+      <span class="badge-admin">OPERATIONS DESK</span>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-btn">← Flight Search</a>
+      <a href="/book" class="nav-btn">New Booking</a>
+      <button class="btn btn-secondary" onclick="loadBookings()">↻ Refresh</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ADMIN AUTH CARD -->
+  <div class="card" id="authCard">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <h3 style="margin: 0 0 4px 0; font-size: 16px;">🔐 Administrator Access</h3>
+        <div class="muted">Enter your Admin Key to display and manage all agent bookings (Configured in .env: <code>om</code>)</div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items:center;">
+        <input id="keyInput" type="password" placeholder="Admin Key" style="width: 160px;">
+        <button class="btn" onclick="saveKeyAndLoad()">Unlock Admin</button>
+      </div>
+    </div>
+    <div id="authNotice" style="margin-top: 8px;"></div>
+  </div>
+
+  <!-- STATS OVERVIEW -->
+  <div class="stats-grid" id="statsArea">
+    <div class="stat-card">
+      <div class="stat-label">Total Bookings</div>
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="muted" style="font-size: 11px;">Temporary Database</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending Requested</div>
+      <div class="stat-value" style="color: var(--warn);" id="statRequested">0</div>
+      <div class="muted" style="font-size: 11px;">Awaiting PNR confirmation</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Booked & Confirmed</div>
+      <div class="stat-value" style="color: var(--ok);" id="statBooked">0</div>
+      <div class="muted" style="font-size: 11px;">Tickets issued with PNR</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Booking Volume</div>
+      <div class="stat-value" style="color: #60a5fa;" id="statVolume">₹0</div>
+      <div class="muted" style="font-size: 11px;">Total quoted value</div>
+    </div>
+  </div>
+
+  <!-- FILTER & SEARCH BAR -->
+  <div class="controls-row">
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="setFilter('all', this)">All Bookings</button>
+      <button class="filter-tab" onclick="setFilter('requested', this)">Requested</button>
+      <button class="filter-tab" onclick="setFilter('booked', this)">Booked</button>
+      <button class="filter-tab" onclick="setFilter('cancelled', this)">Cancelled</button>
+    </div>
+
+    <div style="display:flex; gap: 8px; align-items:center;">
+      <input type="text" id="searchInput" placeholder="Search by Agent, Passenger, ID, Phone..." style="width: 300px;" oninput="applyFilters()">
+    </div>
+  </div>
+
+  <!-- BOOKINGS CONTAINER -->
+  <div id="bookingsList">
+    <div class="card muted" style="text-align:center; padding: 40px;">
+      Loading bookings from temporary database...
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const inr = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  let allBookings = [];
+  let currentFilter = 'all';
+
+  // Initialize Admin Key from localStorage or default 'om'
+  const savedKey = localStorage.getItem('flightdesk_admin_key') || 'om';
+  $('keyInput').value = savedKey;
+
+  function getKey() {
+    return $('keyInput').value.trim() || 'om';
+  }
+
+  function getHeaders() {
+    return {
+      'x-admin-key': getKey(),
+      'Content-Type': 'application/json'
+    };
+  }
+
+  function saveKeyAndLoad() {
+    const k = getKey();
+    localStorage.setItem('flightdesk_admin_key', k);
+    loadBookings();
+  }
+
+  function setFilter(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  async function loadBookings() {
+    $('authNotice').innerHTML = '<span class="muted">Connecting to database...</span>';
+    try {
+      const res = await fetch('/api/admin/bookings', { headers: getHeaders() });
+      if (res.status === 401) {
+        $('authNotice').innerHTML = '<span style="color:var(--danger)">❌ Invalid Admin Key. Please enter the correct key.</span>';
+        $('bookingsList').innerHTML = '<div class="card muted" style="text-align:center;">Enter the correct admin key above to view bookings.</div>';
+        return;
+      }
+      if (!res.ok) throw new Error('Failed to load bookings');
+      
+      allBookings = await res.json();
+      $('authNotice').innerHTML = '<span style="color:var(--ok)">✓ Admin Authenticated</span>';
+      
+      updateStats();
+      applyFilters();
+    } catch (err) {
+      $('authNotice').innerHTML = `<span style="color:var(--danger)">Error: ${esc(err.message)}</span>`;
+    }
+  }
+
+  function updateStats() {
+    const total = allBookings.length;
+    const requested = allBookings.filter(b => b.status === 'requested').length;
+    const booked = allBookings.filter(b => b.status === 'booked').length;
+    const vol = allBookings.reduce((sum, b) => sum + (Number(b.quotedPrice) || 0), 0);
+
+    $('statTotal').textContent = total;
+    $('statRequested').textContent = requested;
+    $('statBooked').textContent = booked;
+    $('statVolume').textContent = inr(vol);
+  }
+
+  function applyFilters() {
+    const query = $('searchInput').value.trim().toLowerCase();
+    
+    const filtered = allBookings.filter(b => {
+      // Status filter
+      if (currentFilter !== 'all' && b.status !== currentFilter) {
+        return false;
+      }
+      // Text search
+      if (query) {
+        const str = `${b.id} ${b.agentName} ${b.passengerName} ${b.mobile} ${b.email} ${b.pnr || ''} ${b.tripType || ''}`.toLowerCase();
+        return str.includes(query);
+      }
+      return true;
+    });
+
+    renderBookings(filtered);
+  }
+
+  function renderBookings(list) {
+    const container = $('bookingsList');
+    if (!list.length) {
+      container.innerHTML = `
+        <div class="card muted" style="text-align:center; padding: 40px;">
+          No bookings found matching current filters.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = list.map(b => {
+      const isBooked = b.status === 'booked';
+      const isCancelled = b.status === 'cancelled' || b.status === 'failed';
+      const statusBadge = isBooked 
+        ? '<span class="badge badge-booked">✓ Booked</span>'
+        : (isCancelled ? '<span class="badge badge-cancelled">✕ Cancelled</span>' : '<span class="badge badge-requested">⏳ Requested</span>');
+
+      const dateStr = b.createdAt ? new Date(b.createdAt).toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      }) : 'N/A';
+
+      // Route format helper
+      let routeHtml = 'Standard Flight Route';
+      const itin = b.itinerary || {};
+      if (itin.selected && itin.selected.legs) {
+        routeHtml = itin.selected.legs.map(l => `<b>${l.from}</b> → <b>${l.to}</b> (${esc(l.airline)} ${esc(l.flightNo)})`).join('<br>');
+        if (itin.outbound && itin.outbound.legs) {
+          routeHtml = `<div style="color:#60a5fa; font-weight:700;">OUTBOUND:</div>${itin.outbound.legs.map(l => `${l.from} → ${l.to} (${l.flightNo})`).join(', ')}<br><div style="color:#34d399; font-weight:700; margin-top:4px;">RETURN:</div>` + routeHtml;
+        }
+      } else if (itin.routeSummary) {
+        routeHtml = `<b>${esc(itin.routeSummary)}</b> ${itin.flightNo ? '· ' + esc(itin.flightNo) : ''} (${itin.deptDate || ''})`;
+      }
+
+      return `
+        <div class="booking-item" id="item-${b.id}">
+          <div class="booking-header">
+            <div class="booking-id">
+              <span>✈️ ${b.id}</span>
+              ${statusBadge}
+              <span class="badge badge-trip">${esc(b.tripType || 'One Way')}</span>
+            </div>
+            <div class="muted" style="font-size: 12px;">
+              Created: ${dateStr}
+            </div>
+          </div>
+
+          <div class="booking-grid">
+            <!-- Col 1: Agent & Traveler Details -->
+            <div>
+              <div class="info-label">Agent Name</div>
+              <div class="info-val">🏢 <b>${esc(b.agentName || 'Independent Agent')}</b></div>
+
+              <div class="info-label">Passenger Name</div>
+              <div class="info-val">👤 <b>${esc(b.passengerName || 'N/A')}</b></div>
+
+              <div class="info-label">Contact Details</div>
+              <div class="info-val">
+                📞 <a href="tel:${esc(b.mobile)}">${esc(b.mobile || 'N/A')}</a><br>
+                ✉️ <a href="mailto:${esc(b.email)}">${esc(b.email || 'N/A')}</a>
+              </div>
+            </div>
+
+            <!-- Col 2: Flight Route -->
+            <div>
+              <div class="info-label">Journey & Route</div>
+              <div class="route-box">${routeHtml}</div>
+              ${b.notes ? `
+                <div style="margin-top: 8px;">
+                  <div class="info-label">Special Notes</div>
+                  <div class="muted" style="font-size:12px;">${esc(b.notes)}</div>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Col 3: Quoted Price & PNR Status -->
+            <div style="text-align: right;">
+              <div class="info-label">Quoted Ticket Fare</div>
+              <div style="font-size: 24px; font-weight: 800; color: var(--ok); margin-bottom: 6px;">
+                ${inr(b.quotedPrice)}
+              </div>
+
+              <div class="info-label">Airline PNR</div>
+              <div style="font-size: 16px; font-weight: 700; color: #60a5fa;">
+                ${b.pnr ? esc(b.pnr) : '<span class="muted" style="font-weight:400; font-size:13px;">Not Assigned Yet</span>'}
+              </div>
+            </div>
+          </div>
+
+          <!-- Action & PNR Update Row -->
+          <div class="action-panel">
+            <span class="info-label" style="margin-right: 4px;">Update PNR:</span>
+            <input type="text" class="pnr-input" id="pnr-input-${b.id}" placeholder="e.g. AB12CD" value="${esc(b.pnr || '')}">
+            
+            <button class="btn btn-success" onclick="updateBookingStatus('${b.id}', 'booked')">
+              ✓ Issue PNR & Confirm
+            </button>
+
+            <button class="btn btn-secondary" onclick="updateBookingStatus('${b.id}', 'requested')">
+              Mark Requested
+            </button>
+
+            <button class="btn btn-danger" onclick="updateBookingStatus('${b.id}', 'cancelled')">
+              ✕ Cancel
+            </button>
+
+            <button class="btn btn-secondary" style="margin-left: auto; color: #f87171;" onclick="deleteBooking('${b.id}')">
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function updateBookingStatus(id, newStatus) {
+    const pnrVal = ($(`pnr-input-${id}`)?.value || '').trim();
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ status: newStatus, pnr: pnrVal })
+      });
+      if (!res.ok) throw new Error('Update failed');
+      loadBookings();
+    } catch (err) {
+      alert('Error updating booking: ' + err.message);
+    }
+  }
+
+  async function deleteBooking(id) {
+    if (!confirm(`Are you sure you want to delete booking ${id} from temporary DB?`)) return;
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      if (!res.ok) throw new Error('Delete failed');
+      loadBookings();
+    } catch (err) {
+      alert('Error deleting booking: ' + err.message);
+    }
+  }
+
+  // Load bookings on startup
+  loadBookings();
+</script>
+</body>
+</html>
