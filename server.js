@@ -93,8 +93,8 @@ const paxCount = (q) => (+q.adults || 1) + (+q.children || 0) + (+q.infants || 0
 const ourPrice = (price, q) => Math.max(Math.round(price - DISCOUNT * paxCount(q)), 0);
 
 const slim = (f, q) => ({
-  airline: f.flights[0]?.airline || 'Unknown Airline',
-  logo: f.airline_logo || f.flights[0]?.airline_logo || '',
+  airline: f.flights?.[0]?.airline || 'Unknown Airline',
+  logo: f.airline_logo || f.flights?.[0]?.airline_logo || '',
   legs: (f.flights || []).map((l) => ({
     from: l.departure_airport?.id,
     fromName: l.departure_airport?.name,

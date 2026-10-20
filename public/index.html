@@ -489,11 +489,11 @@
     <div class="grid">
       <div>
         <label>Origin Airport</label>
-        <input id="from" list="airports" placeholder="DEL (e.g. Delhi)" required maxlength="3" style="text-transform:uppercase;">
+        <input id="from" list="airports" placeholder="DEL or Delhi" required autocomplete="off" style="text-transform:uppercase;">
       </div>
       <div>
         <label>Destination Airport</label>
-        <input id="to" list="airports" placeholder="BOM (e.g. Mumbai)" required maxlength="3" style="text-transform:uppercase;">
+        <input id="to" list="airports" placeholder="BOM or Mumbai" required autocomplete="off" style="text-transform:uppercase;">
       </div>
       <div>
         <label>Departure Date</label>
@@ -761,15 +761,60 @@
     return card;
   }
 
+  // Resolve common city names or full datalist strings to 3-letter IATA code
+  const CITY_TO_IATA = {
+    'DELHI': 'DEL',
+    'NEW DELHI': 'DEL',
+    'MUMBAI': 'BOM',
+    'BOMBAY': 'BOM',
+    'BENGALURU': 'BLR',
+    'BANGALORE': 'BLR',
+    'HYDERABAD': 'HYD',
+    'CHENNAI': 'MAA',
+    'MADRAS': 'MAA',
+    'KOLKATA': 'CCU',
+    'CALCUTTA': 'CCU',
+    'PUNE': 'PNQ',
+    'AHMEDABAD': 'AMD',
+    'GOA': 'GOI',
+    'JAIPUR': 'JAI',
+    'LUCKNOW': 'LKO',
+    'RAIPUR': 'RPR',
+    'BHUBANESWAR': 'BBI',
+    'NAGPUR': 'NAG',
+    'DUBAI': 'DXB',
+    'SINGAPORE': 'SIN',
+    'LONDON': 'LHR',
+    'NEW YORK': 'JFK'
+  };
+
+  function parseAirportCode(str) {
+    if (!str) return '';
+    const clean = str.trim().toUpperCase();
+    if (CITY_TO_IATA[clean]) return CITY_TO_IATA[clean];
+    const match = clean.match(/\b([A-Z]{3})\b/);
+    if (match) return match[1];
+    return clean.slice(0, 3);
+  }
+
+  // Backward compatibility alias
+  function closeBooking() {
+    closeBookingModal();
+  }
+
   // Handle Search Submission
   $('searchForm').onsubmit = async (e) => {
     e.preventDefault();
-    closeBooking();
+    closeBookingModal();
     outboundSelected = null;
     finalSelectedFlight = null;
 
-    const fromVal = $('from').value.trim().toUpperCase();
-    const toVal = $('to').value.trim().toUpperCase();
+    const rawFrom = $('from').value.trim();
+    const rawTo = $('to').value.trim();
+    const fromVal = parseAirportCode(rawFrom);
+    const toVal = parseAirportCode(rawTo);
+    if (fromVal) $('from').value = fromVal;
+    if (toVal) $('to').value = toVal;
     const dateVal = $('date').value;
     const retVal = $('ret').value;
 
