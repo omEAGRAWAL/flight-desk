@@ -1,0 +1,5 @@
+node_modules
+.env
+bookings.json
+.DS_Store
+.vercel

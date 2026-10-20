@@ -6,9 +6,11 @@ import crypto from 'crypto';
 
 const { SERPAPI_KEY, ADMIN_KEY = 'om', PORT = 3000 } = process.env;
 const DISCOUNT = Number(process.env.DISCOUNT_PER_PASSENGER ?? 500); // INR off per passenger
-const DB = './bookings.json';
+const DB = process.env.VERCEL ? path.join('/tmp', 'bookings.json') : './bookings.json';
 
-if (!SERPAPI_KEY) { console.error('Set SERPAPI_KEY in .env'); process.exit(1); }
+if (!SERPAPI_KEY) {
+  console.warn('Warning: SERPAPI_KEY is not set in environment variables');
+}
 
 const app = express();
 app.use(express.json());
@@ -247,5 +249,9 @@ app.delete('/api/admin/bookings/:id', admin, (req, res) => {
   res.json({ message: 'Booking deleted', deleted: removed[0] });
 });
 
-app.listen(PORT, () => console.log(`Flight desk running on http://localhost:${PORT}`));
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`Flight desk running on http://localhost:${PORT}`));
+}
+
+export default app;
 
