@@ -2,7 +2,15 @@
   "name": "flight-desk",
   "version": "1.0.0",
   "type": "module",
-  "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=18" },
-  "dependencies": { "dotenv": "^16.4.5", "express": "^4.19.2" }
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "axios": "^1.20.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
 }

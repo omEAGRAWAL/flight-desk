@@ -330,6 +330,31 @@
       padding: 3px 10px;
       border-radius: 6px;
     }
+    .provider-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
+    .provider-badge.serp {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .provider-badge.dog {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+    .provider-badge.both {
+      background: #fdf4ff;
+      color: #9333ea;
+      border: 1px solid #e9d5ff;
+    }
 
     .muted { color: var(--muted); font-size: 13px; }
     .err-box {
@@ -530,6 +555,14 @@
           <option value="">Any Stops</option>
           <option value="1">Non-stop only</option>
           <option value="2">Up to 1 Stop</option>
+        </select>
+      </div>
+      <div>
+        <label>Search Provider</label>
+        <select id="provider">
+          <option value="any">✨ Any (Auto / Compare / Fallback)</option>
+          <option value="serpapi">⚡ SerpApi (Google Flights)</option>
+          <option value="scrapingdog">🐶 Scrapingdog (Google Flights)</option>
         </select>
       </div>
     </div>
@@ -739,6 +772,9 @@
           ${flight.logo ? `<img class="airline-logo" src="${esc(flight.logo)}" alt="">` : ''}
           <div class="airline-name">${esc(flight.airline)}</div>
           <span class="muted" style="font-size:12px;">• ${hm(flight.totalDuration)} • ${stopsText}</span>
+          ${flight.providerBadge ? `<span class="provider-badge both">✨ ${esc(flight.providerBadge)}</span>` : 
+            flight.provider === 'scrapingdog' ? `<span class="provider-badge dog">🐶 Scrapingdog</span>` :
+            `<span class="provider-badge serp">⚡ SerpApi</span>`}
         </div>
         ${legsHtml}
       </div>
@@ -823,6 +859,7 @@
       return;
     }
 
+    const chosenProvider = $('provider').value;
     const params = new URLSearchParams({
       from: fromVal,
       to: toVal,
@@ -832,7 +869,8 @@
       children: $('children').value,
       infants: $('infants').value,
       cls: $('cls').value,
-      stops: $('stops').value
+      stops: $('stops').value,
+      provider: chosenProvider
     });
 
     if (currentTripType === 'roundtrip' && retVal) {
@@ -843,10 +881,15 @@
     $('searchBtn').disabled = true;
     $('results').innerHTML = '';
     $('outboundSummary').innerHTML = '';
+
+    const provDisplay = chosenProvider === 'scrapingdog' ? '🐶 Scrapingdog' :
+                        chosenProvider === 'serpapi' ? '⚡ SerpApi' :
+                        '✨ Any Provider (Auto Compare & Fallback)';
+
     $('statusNotice').innerHTML = `
       <div class="loading-box">
         <div class="spinner"></div>
-        Searching live flight fares from ${fromVal} to ${toVal} (${currentTripType === 'roundtrip' ? 'Round Trip' : 'One Way'})...
+        Searching live flight fares from ${fromVal} to ${toVal} (${currentTripType === 'roundtrip' ? 'Round Trip' : 'One Way'} • ${provDisplay})...
       </div>
     `;
 
@@ -855,9 +898,13 @@
       currentDiscount = data.discount || 500;
       $('statusNotice').innerHTML = '';
 
+      const provNote = data.providersUsed && data.providersUsed.length > 1
+        ? ` <span class="muted" style="font-size:13px; font-weight:normal;">(Searched across ${data.providersUsed.map(p => p === 'scrapingdog' ? '🐶 Scrapingdog' : '⚡ SerpApi').join(' + ')})</span>`
+        : (data.provider ? ` <span class="muted" style="font-size:13px; font-weight:normal;">(via ${data.provider === 'scrapingdog' ? '🐶 Scrapingdog' : '⚡ SerpApi'})</span>` : '');
+
       const title = currentTripType === 'roundtrip' 
-        ? `Step 1: Choose Your Departure Flight (Going: ${fromVal} → ${toVal})`
-        : `Available One-Way Flights (${fromVal} → ${toVal})`;
+        ? `Step 1: Choose Your Departure Flight (Going: ${fromVal} → ${toVal})${provNote}`
+        : `Available One-Way Flights (${fromVal} → ${toVal})${provNote}`;
 
       const action = currentTripType === 'roundtrip' ? 'Select Departure Flight →' : 'Book Flight ✓';
       const onSelect = currentTripType === 'roundtrip' ? pickOutboundFlight : openBookingModal;
@@ -935,7 +982,8 @@
     `;
 
     try {
-      const data = await api(`/api/return?${searchQuery}&departure_token=${encodeURIComponent(f.departureToken)}`);
+      const provForReturn = f.provider || $('provider').value || 'any';
+      const data = await api(`/api/return?${searchQuery}&departure_token=${encodeURIComponent(f.departureToken)}&provider=${encodeURIComponent(provForReturn)}`);
       $('statusNotice').innerHTML = '';
       renderResultsList(data.flights, 'Step 2: Choose Your Return Flight (Coming Back)', 'Select Return & Book ✓', (retFlight) => {
         finalSelectedFlight = retFlight;

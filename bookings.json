@@ -56,5 +56,79 @@
       "agency": "j    jkj"
     },
     "passengers": "jhn"
+  },
+  {
+    "id": "FD-50E803",
+    "createdAt": "2026-10-20T12:07:49.458Z",
+    "status": "requested",
+    "pnr": null,
+    "agentName": "bhjb",
+    "passengerName": "m m",
+    "email": "agrawalom711@gmail.com",
+    "mobile": "7609098787",
+    "tripType": "One Way",
+    "itinerary": {
+      "tripType": "One Way",
+      "outbound": null,
+      "selected": {
+        "airline": "IndiGo",
+        "logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png",
+        "legs": [
+          {
+            "from": "BOM",
+            "fromName": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "dep": "2026-10-21 17:00",
+            "to": "BLR",
+            "toName": "Kempegowda International Airport Bengaluru",
+            "arr": "2026-10-21 18:55",
+            "flightNo": "6E 5221",
+            "airline": "IndiGo",
+            "duration": 115
+          },
+          {
+            "from": "BLR",
+            "fromName": "Kempegowda International Airport Bengaluru",
+            "dep": "2026-10-21 20:20",
+            "to": "MAA",
+            "toName": "Chennai International Airport",
+            "arr": "2026-10-21 21:25",
+            "flightNo": "6E 6077",
+            "airline": "IndiGo",
+            "duration": 65
+          }
+        ],
+        "layovers": [
+          {
+            "id": "BLR",
+            "duration": 85
+          }
+        ],
+        "totalDuration": 265,
+        "googlePrice": 8222,
+        "ourPrice": 7722,
+        "bookingToken": "WyJDalJJVURONWVGVm1jbXhNZERCQlEwUjRaa0ZDUnkwdExTMHRMUzB0ZVdsaWFuQXhOMEZCUVVGQlIzSllWMWxWVGtGTVVuZEJFZzAyUlRVeU1qRjhOa1UyTURjM0dnb0lua0FRQUJvRFNVNVNPQnh3M0VNPSIsW1siQk9NIiwiMjAyNi0xMC0yMSIsIkJMUiIsbnVsbCwiNkUiLCI1MjIxIl0sWyJCTFIiLCIyMDI2LTEwLTIxIiwiTUFBIixudWxsLCI2RSIsIjYwNzciXV1d"
+      },
+      "query": {
+        "from": "BOM",
+        "to": "MAA",
+        "date": "2026-10-21",
+        "tripType": "oneway",
+        "adults": "1",
+        "children": "0",
+        "infants": "0",
+        "cls": "1",
+        "stops": ""
+      }
+    },
+    "quotedPrice": 7722,
+    "googlePrice": 8222,
+    "notes": "",
+    "contact": {
+      "name": "m m",
+      "phone": "7609098787",
+      "email": "agrawalom711@gmail.com",
+      "agency": "bhjb"
+    },
+    "passengers": "m m"
   }
 ]
