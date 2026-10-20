@@ -359,8 +359,17 @@
       <button class="filter-tab" onclick="setFilter('cancelled', this)">Cancelled</button>
     </div>
 
-    <div style="display:flex; gap: 8px; align-items:center;">
-      <input type="text" id="searchInput" placeholder="Search by Agent, Passenger, ID, Phone..." style="width: 300px;" oninput="applyFilters()">
+    <div style="display:flex; gap: 8px; align-items:center; flex-wrap: wrap;">
+      <input type="text" id="searchInput" placeholder="Search by Agent, Passenger, ID, Phone..." style="width: 260px;" oninput="applyFilters()">
+      <button class="btn btn-secondary" onclick="exportJson()" title="Download JSON file for database import">💾 Export JSON</button>
+      <button class="btn btn-secondary" onclick="exportCsv()" title="Download CSV for Excel">📊 Export CSV</button>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 12px 18px; margin-bottom: 16px; background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.25);">
+    <div style="font-size: 13px; color: #93c5fd; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+      <span>💡 <b>Temporary DB Active:</b> Bookings are safely stored in memory and <code>bookings.json</code>. When you add a permanent DB (MongoDB/PostgreSQL/Supabase) later, click <b>Export JSON</b> to migrate all data instantly.</span>
+      <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" onclick="copyAllJson()">📋 Copy JSON</button>
     </div>
   </div>
 
@@ -603,6 +612,48 @@
     } catch (err) {
       alert('Error deleting booking: ' + err.message);
     }
+  }
+
+  function exportJson() {
+    if (!allBookings.length) { alert('No bookings to export.'); return; }
+    const blob = new Blob([JSON.stringify(allBookings, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `flight_desk_bookings_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportCsv() {
+    if (!allBookings.length) { alert('No bookings to export.'); return; }
+    const headers = ['ID', 'Date', 'Status', 'PNR', 'Agent', 'Passenger', 'Email', 'Mobile', 'TripType', 'QuotedFare', 'Notes'];
+    const rows = allBookings.map(b => [
+      b.id,
+      b.createdAt || '',
+      b.status || '',
+      b.pnr || '',
+      `"${(b.agentName || '').replace(/"/g, '""')}"`,
+      `"${(b.passengerName || '').replace(/"/g, '""')}"`,
+      `"${(b.email || '').replace(/"/g, '""')}"`,
+      `"${(b.mobile || '').replace(/"/g, '""')}"`,
+      b.tripType || '',
+      b.quotedPrice || 0,
+      `"${(b.notes || '').replace(/"/g, '""')}"`
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const a = document.createElement('a');
+    a.href = encodedUri;
+    a.download = `flight_desk_bookings_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+  }
+
+  function copyAllJson() {
+    if (!allBookings.length) { alert('No bookings to copy.'); return; }
+    navigator.clipboard.writeText(JSON.stringify(allBookings, null, 2))
+      .then(() => alert('All bookings JSON copied to clipboard!'))
+      .catch(() => alert('Failed to copy.'));
   }
 
   // Load bookings on startup
